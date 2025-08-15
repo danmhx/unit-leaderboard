@@ -240,7 +240,12 @@ async function submitRankings() {
     setTimeout(() => closeModal(), 650);
   } catch (err) {
     console.error(err);
-    submitStatus.textContent = "Submission failed. Please try again.";
+    const msg =
+      err?.message ||
+      err?.error?.message ||
+      err?.error_description ||
+      JSON.stringify(err);
+    submitStatus.textContent = `Submission failed: ${msg}`;
   } finally {
     submitBtn.disabled = false;
   }
