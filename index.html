@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>new-units</title>
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Units Battlegrounds Tier List</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- SortableJS (drag & drop) -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js" defer></script>
+
+  <!-- Supabase JS v2 (UMD) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+
+  <!-- App Script -->
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1>Units Battlegrounds Tier List</h1>
+      <p class="tagline">A friendly, community-driven ranking for your favorite units ✨</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="controls">
+      <button id="openModalBtn" class="primary-btn">Create Your Tier List!</button>
+    </section>
+
+    <section class="leaderboard card">
+      <div class="leaderboard-head">
+        <h2>Community Leaderboard</h2>
+        <div id="lbStatus" class="status">Loading…</div>
+      </div>
+      <ul id="leaderboardList" class="leaderboard-list" aria-live="polite"></ul>
+    </section>
+  </main>
+
+  <!-- Voting Modal -->
+  <div id="tierModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-backdrop" data-close></div>
+
+    <div class="modal-content">
+      <header class="modal-header">
+        <h3 id="modalTitle">Drag & Drop Your Tier List</h3>
+        <button class="icon-btn" id="closeModalBtn" aria-label="Close">&times;</button>
+      </header>
+
+      <section class="modal-body">
+        <div class="tier-layout">
+          <!-- Unranked Pool -->
+          <div class="pool card">
+            <div class="pool-head">
+              <h4>Unranked Units</h4>
+              <input id="unitSearch" type="search" placeholder="Search units…" aria-label="Search unranked units">
+            </div>
+            <div id="unrankedPool" class="unit-list droplist" aria-label="Unranked Units"></div>
+          </div>
+
+          <!-- Tier Columns -->
+          <div class="tiers">
+            <div class="tier-col card tier-S">
+              <div class="tier-head"><span class="badge badge-S">S</span><span>Legendary</span></div>
+              <div id="tier-S" class="unit-list droplist" data-tier="S" aria-label="S Tier"></div>
+            </div>
+            <div class="tier-col card tier-A">
+              <div class="tier-head"><span class="badge badge-A">A</span><span>Excellent</span></div>
+              <div id="tier-A" class="unit-list droplist" data-tier="A" aria-label="A Tier"></div>
+            </div>
+            <div class="tier-col card tier-B">
+              <div class="tier-head"><span class="badge badge-B">B</span><span>Great</span></div>
+              <div id="tier-B" class="unit-list droplist" data-tier="B" aria-label="B Tier"></div>
+            </div>
+            <div class="tier-col card tier-C">
+              <div class="tier-head"><span class="badge badge-C">C</span><span>Good</span></div>
+              <div id="tier-C" class="unit-list droplist" data-tier="C" aria-label="C Tier"></div>
+            </div>
+            <div class="tier-col card tier-D">
+              <div class="tier-head"><span class="badge badge-D">D</span><span>Okay</span></div>
+              <div id="tier-D" class="unit-list droplist" data-tier="D" aria-label="D Tier"></div>
+            </div>
+            <div class="tier-col card tier-F">
+              <div class="tier-head"><span class="badge badge-F">F</span><span>Needs Work</span></div>
+              <div id="tier-F" class="unit-list droplist" data-tier="F" aria-label="F Tier"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="modal-footer">
+        <button id="submitBtn" class="primary-btn">Submit Your Rankings</button>
+        <div id="submitStatus" class="status" role="status" aria-live="polite"></div>
+      </footer>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <small>Built with ❤️ by the community. Drag, drop, and have fun!</small>
+    </div>
+  </footer>
+</body>
+</html>
+<!-- partial -->
+  <script  src="./script.js"></script>
+
+</body>
+</html>

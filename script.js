@@ -48,7 +48,6 @@ const POINTS_TO_TIER = (avg) => {
   if (avg >= 1.5) return "D";
   return "F";
 };
-
 const toFixedOrDash = (n) => (n == null ? "—" : Number(n).toFixed(2));
 
 /***** 🔌 Supabase Client *****/
@@ -59,9 +58,11 @@ const leaderboardList = document.getElementById("leaderboardList");
 const lbStatus = document.getElementById("lbStatus");
 
 const tierModal = document.getElementById("tierModal");
+const modalBody = document.querySelector(".modal-body");
 const openModalBtn = document.getElementById("openModalBtn");
 const closeModalBtn = document.getElementById("closeModalBtn");
 const unrankedPool = document.getElementById("unrankedPool");
+const unitSearch = document.getElementById("unitSearch");
 const submitBtn = document.getElementById("submitBtn");
 const submitStatus = document.getElementById("submitStatus");
 
@@ -70,7 +71,6 @@ const tierContainers = ["S","A","B","C","D","F"].map(t => ({
 }));
 
 /***** 🧹 Utils *****/
-// Deduplicate units by name (keep the first occurrence)
 function dedupeUnits(list) {
   const seen = new Set();
   const out = [];
@@ -82,7 +82,7 @@ function dedupeUnits(list) {
   return out;
 }
 
-// Create a draggable unit DOM node
+// Create a draggable unit DOM node + quick-send buttons
 function createUnitItem(unit) {
   const el = document.createElement("div");
   el.className = "unit-item";
@@ -101,16 +101,35 @@ function createUnitItem(unit) {
 
   left.append(chip, title);
 
-  const hint = document.createElement("span");
-  hint.className = "drag-hint";
-  hint.textContent = "↕︎ drag";
+  // Quick-send buttons (teleport into a tier)
+  const actions = document.createElement("div");
+  actions.className = "unit-actions";
+  ["S","A","B","C","D","F"].forEach(t => {
+    const b = document.createElement("button");
+    b.className = `quick-send quick-${t}`;
+    b.type = "button";
+    b.textContent = t;
+    b.title = `Send to ${t} tier`;
+    b.addEventListener("click", () => quickSendToTier(el, t));
+    actions.appendChild(b);
+  });
 
-  el.append(left, hint);
+  el.append(left, actions);
   return el;
 }
 
 function clearChildren(node) {
   while (node.firstChild) node.removeChild(node.firstChild);
+}
+
+/***** 🚀 Quick Send *****/
+function quickSendToTier(itemEl, tier) {
+  const container = tierContainers.find(tc => tc.tier === tier)?.el;
+  if (!container) return;
+  container.appendChild(itemEl);
+  // subtle feedback
+  itemEl.classList.add("dragging");
+  setTimeout(() => itemEl.classList.remove("dragging"), 200);
 }
 
 /***** 🖱️ Drag & Drop (SortableJS) *****/
@@ -124,12 +143,18 @@ function setupSortable(listEl) {
     dragClass: "dragging",
     forceFallback: true,
 
-    // 🔒 Disable text selection globally while dragging
+    // ⚡ Faster autoscroll while dragging
+    scroll: true,
+    scrollSensitivity: 90, // start scrolling sooner near edges
+    scrollSpeed: 24,       // accelerate scroll speed
+    bubbleScroll: true,
+    scrollEl: modalBody,   // scroll the modal body instead of the window
+
     onStart: () => document.body.classList.add("dragging"),
     onEnd: () => document.body.classList.remove("dragging")
   });
 
-  // Prevent accidental long-press text selection on touch devices
+  // Prevent long-press text selection on touch devices
   listEl.addEventListener("touchstart", (e) => {
     if (e.touches.length === 1) e.preventDefault();
   }, { passive: false });
@@ -141,28 +166,39 @@ function openModal() {
   tierModal.setAttribute("aria-hidden", "false");
   submitStatus.textContent = "";
   populateUnranked();
+  unitSearch.value = "";
 }
 function closeModal() {
   tierModal.classList.remove("active");
   tierModal.setAttribute("aria-hidden", "true");
 }
 
-// Close on backdrop or X
 tierModal.addEventListener("click", (e) => {
   if (e.target.matches("[data-close]")) closeModal();
 });
 openModalBtn.addEventListener("click", openModal);
 closeModalBtn.addEventListener("click", closeModal);
 
+/***** 🔎 Search filter for Unranked *****/
+function applySearchFilter() {
+  const q = unitSearch.value.trim().toLowerCase();
+  const items = Array.from(unrankedPool.children);
+  for (const el of items) {
+    const name = el.dataset.name.toLowerCase();
+    const cls = el.querySelector(".unit-chip")?.textContent.toLowerCase() || "";
+    const match = !q || name.includes(q) || cls.includes(q);
+    el.style.display = match ? "" : "none";
+  }
+}
+unitSearch?.addEventListener("input", applySearchFilter);
+
 /***** 🧺 Populate Unranked *****/
 function populateUnranked() {
   const uniqueUnits = dedupeUnits(units);
-  // clear all lists
   clearChildren(unrankedPool);
   for (const { el } of tierContainers) clearChildren(el);
-
-  // add all units to unranked
   uniqueUnits.forEach((u) => unrankedPool.appendChild(createUnitItem(u)));
+  applySearchFilter();
 }
 
 /***** 🧾 Collect Ranked Entries *****/
@@ -180,7 +216,7 @@ function collectRanked() {
   return ranked;
 }
 
-/***** 🚀 Submit Rankings via RPC *****/
+/***** 📤 Submit Rankings via RPC *****/
 async function submitRankings() {
   if (!supabase) {
     submitStatus.textContent = "Supabase config missing. Please add your URL & anon key.";
@@ -188,7 +224,7 @@ async function submitRankings() {
   }
   const items = collectRanked();
   if (items.length === 0) {
-    submitStatus.textContent = "You didn't rank any units yet. Drag some into tiers!";
+    submitStatus.textContent = "You didn't rank any units yet. Drag or Quick-Send some into tiers!";
     return;
   }
   submitBtn.disabled = true;
@@ -196,11 +232,11 @@ async function submitRankings() {
 
   try {
     const payload = { [RPC_PARAM_NAME]: items };
-    const { data, error } = await supabase.rpc("submit_tier_list", payload);
+    const { error } = await supabase.rpc("submit_tier_list", payload);
     if (error) throw error;
 
     submitStatus.textContent = "Thanks! Your rankings were recorded. Refreshing leaderboard…";
-    await loadLeaderboard(); // refresh
+    await loadLeaderboard();
     setTimeout(() => closeModal(), 650);
   } catch (err) {
     console.error(err);
@@ -294,13 +330,10 @@ async function loadLeaderboard() {
 
 /***** ⛓️ Init Sortables *****/
 document.addEventListener("DOMContentLoaded", () => {
-  // Setup Sortable on all droplists
   setupSortable(unrankedPool);
   tierContainers.forEach(({ el }) => setupSortable(el));
 
-  // Hook submit
   submitBtn.addEventListener("click", submitRankings);
 
-  // First load
   loadLeaderboard();
 });
