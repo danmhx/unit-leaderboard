@@ -1,0 +1,47 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 <!DOCTYPE html>\
+<html lang="en">\
+<head>\
+    <meta charset="UTF-8">\
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">\
+    <title>RAID: Shadow Legends - Community Leaderboard</title>\
+    <link rel="stylesheet" href="style.css">\
+</head>\
+<body>\
+\
+    <header>\
+        <h1>RAID: Shadow Legends</h1>\
+        <h2>Community Voted Leaderboard</h2>\
+    </header>\
+\
+    <main>\
+        <div id="leaderboards-container">\
+            <div class="loader"></div>\
+            <p>Loading Leaderboards...</p>\
+        </div>\
+\
+        <button id="show-vote-modal-button">Vote For The Best Unit!</button>\
+    </main>\
+\
+    <div id="vote-modal" class="modal-overlay" style="display:none;">\
+        <div class="modal-content">\
+            <span class="close-button">&times;</span>\
+            <h2>Cast Your Vote</h2>\
+            <p>Select your favorite unit from the list below to vote for them.</p>\
+            <select id="unit-select-dropdown">\
+                <option value="">-- Please choose a unit --</option>\
+            </select>\
+            <button id="submit-vote-button">Submit Vote</button>\
+        </div>\
+    </div>\
+\
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>\
+    <script src="script.js"></script>\
+</body>\
+</html>}
