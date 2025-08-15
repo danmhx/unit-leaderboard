@@ -162,7 +162,7 @@ h1, h2, h3, h4 {
   background: #fbfcff;
   border: 1px dashed #dbe1f1;
   display: grid;
-  grid-auto-rows: minmax(52px, auto);
+  grid-auto-rows: minmax(60px, auto); /* a hair taller to fit 2nd row */
   gap: 10px;
 }
 
@@ -197,19 +197,27 @@ h1, h2, h3, h4 {
   background: #fff;
   border-radius: 14px;
   border: 1px solid #eef1f7;
-  padding: 8px 12px;
-  display:flex; align-items:center; justify-content:space-between; gap: 10px;
+  padding: 8px 12px 10px;
+  display:flex;
+  flex-direction: column;   /* stack name and buttons */
+  gap: 6px;
   cursor: grab;
   transition: transform .08s ease, box-shadow .2s ease;
 
-  user-select: none;           /* stop blue highlight */
-  -webkit-user-drag: none;     /* Safari */
+  user-select: none;
+  -webkit-user-drag: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
 .unit-item:active { cursor: grabbing; }
 
-.unit-left { display:flex; align-items:center; gap: 10px; min-width: 0; }
+/* Header row: chip + name — full width, no truncation for short names */
+.unit-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
 .unit-chip {
   font-size: 12px;
   padding: 4px 8px;
@@ -219,17 +227,32 @@ h1, h2, h3, h4 {
   color: #556;
   white-space: nowrap;
 }
-.unit-name-compact { font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.drag-hint { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.unit-name-compact {
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* used only if it truly overflows */
+}
 
-/* 🚀 Quick-Send tier badges */
+/* 🚀 Quick-Send tier badges — on their own row under the name */
 .unit-actions {
-  display:flex; gap:6px; align-items:center; margin-left: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-start;
 }
 .quick-send {
-  width: 28px; height: 28px; border-radius: 999px; border: 0; cursor: pointer;
-  font-weight: 900; line-height: 28px; text-align:center; font-size: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+  font-weight: 900;
+  line-height: 28px;
+  text-align:center;
+  font-size: 12px;
   box-shadow: var(--shadow);
+  flex: 0 0 auto;
 }
 .quick-S { background: #ffd24a; }
 .quick-A { background: #7ee087; }
